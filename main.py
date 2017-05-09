@@ -12,14 +12,14 @@ from Location import Location
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 # For certificate based connection
-#myMQTTClient = AWSIoTMQTTClient("LDRTesting")
+myMQTTClient = AWSIoTMQTTClient("LDRTesting")
 # For TLS mutual authentication
-#myMQTTClient.configureEndpoint("a2h72bxx1czemj.iot.us-west-2.amazonaws.com", 8883)
-#myMQTTClient.configureCredentials("/home/pi/Desktop/IOT_THING_RoadReviewPublisher/rootca.pem", "/home/pi/Desktop/IOT_THING_RoadReviewPublisher/private.pem.key", "/home/pi/Desktop/IOT_THING_RoadReviewPublisher/certi.txt")
-#myMQTTClient.configureOfflinePublishQueueing(-1)  # Infinite offline Publish queueing
-#myMQTTClient.configureDrainingFrequency(2)  # Draining: 2 Hz
-#myMQTTClient.configureConnectDisconnectTimeout(10)  # 10 sec
-#myMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
+myMQTTClient.configureEndpoint("a2h72bxx1czemj.iot.us-west-2.amazonaws.com", 8883)
+myMQTTClient.configureCredentials("/home/pi/Desktop/IOT_THING_RoadReviewPublisher/rootca.pem", "/home/pi/Desktop/IOT_THING_RoadReviewPublisher/private.pem.key", "/home/pi/Desktop/IOT_THING_RoadReviewPublisher/certi.txt")
+myMQTTClient.configureOfflinePublishQueueing(-1)  # Infinite offline Publish queueing
+myMQTTClient.configureDrainingFrequency(2)  # Draining: 2 Hz
+myMQTTClient.configureConnectDisconnectTimeout(10)  # 10 sec
+myMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
 
 device_id=1234
 spi = spidev.SpiDev()
@@ -31,9 +31,8 @@ air = Air(spi)
 weather = Temperature()
 loc = Location()
  
-#myMQTTClient.connect() 
+myMQTTClient.connect() 
 while True:
-        print "hello"
         lightPer = ldr.getLdrPer()
         noiseData = noise.getNoise()
         LPG,CO,SMOKE = air.getData()
@@ -57,7 +56,7 @@ while True:
         
         
         
-        #myMQTTClient.publish("EnvironmentData",envData_json,0)
+        myMQTTClient.publish("EnvironmentData",envData_json,0)
         #print "--------------------------------------"
         #print "Light : "
         #print lightPer
