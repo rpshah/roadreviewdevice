@@ -62,6 +62,8 @@ class Air:
 
 
     def MQGetPercentage(self,rs_ro_ratio,pcurve) :
+        if(rs_ro_ratio == 0):
+            return 0
         return (math.pow(10,( ((math.log(rs_ro_ratio)-pcurve[1])/pcurve[2]) + pcurve[0])))
 
 
