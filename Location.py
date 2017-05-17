@@ -56,8 +56,9 @@ class Location:
 
                         return float(s1),float(s2)
             except:
-                 print "No Reading"
-                 print " "
+                 pass
+                 #print "No Reading"
+                 #print " "
 
             cd=cd+1
             #print cd
