@@ -8,6 +8,9 @@ from Air import Air
 from Temperature import Temperature
 from Location import Location
 
+#one time code-run only
+import socket
+
 #for motion
 from mpu6050 import mpu6050
 import math
@@ -20,8 +23,25 @@ import sys
 # Import SDK packages
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
+# Run this file only if it is not running already
+def get_lock(process_name):
+    # Without holding a reference to our socket somewhere it gets garbage
+    # collected when the function exits
+    get_lock._lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+
+    try:
+        get_lock._lock_socket.bind('\0' + process_name)
+        #print 'Road Reviewing Code Started'
+    except socket.error:
+        #print 'File already running'
+        sys.exit()
+
+#lock will be handled automatically with garbage collection
+get_lock('road_review')
+
+
 # For certificate based connection
-myMQTTClient = AWSIoTMQTTClient("LDRTesting")
+myMQTTClient = AWSIoTMQTTClient("RoadReviewerPi")
 # For TLS mutual authentication
 myMQTTClient.configureEndpoint("a2h72bxx1czemj.iot.us-west-2.amazonaws.com", 8883)
 myMQTTClient.configureCredentials("/home/pi/Desktop/IOT_THING_RoadReviewPublisher/rootca.pem", "/home/pi/Desktop/IOT_THING_RoadReviewPublisher/private.pem.key", "/home/pi/Desktop/IOT_THING_RoadReviewPublisher/certi.txt")
@@ -150,7 +170,7 @@ while True:
         LPG,CO,SMOKE = air.getData()
         tempData,humData = weather.getData()
         lati,longi = loc.getLocation()
-        currenttime=time.time()
+        currenttime=int(time.time())
         envData={}
         envData['DeviceId']=device_id
         envData['Timestamp']=currenttime
