@@ -12,17 +12,20 @@ def find(str, ch):
         if ltr == ch:
             yield i
 
-port = serial.Serial("/dev/ttyAMA0", baudrate=9600, timeout=1)
 
 class Location:
 
+    def __init__(self):
+        self.port = serial.Serial("/dev/ttyAMA0", baudrate=9600, timeout=1)
+
+    
     def getLocation(self):
         cd=1
         while cd <= 5:
             ck=0
             fd=''
             while ck <= 50:
-                rcv = port.read(10)
+                rcv = self.port.read(10)
                 fd=fd+rcv
                 ck=ck+1
 
@@ -54,6 +57,7 @@ class Location:
                         #print s1
                         #print s2
 
+                        self.port.flush()
                         return float(s1),float(s2)
             except:
                  pass
@@ -64,6 +68,9 @@ class Location:
             #print cd
 
         return 0,0
+
+    def __del__(self):
+        self.port.close()
 
 
 def main():

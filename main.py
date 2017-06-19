@@ -21,6 +21,8 @@ from threading import Thread
 import sys
 
 # Import SDK packages
+import redis
+import RedisQueue
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 # Run this file only if it is not running already
@@ -38,6 +40,13 @@ def get_lock(process_name):
 
 #lock will be handled automatically with garbage collection
 get_lock('road_review')
+
+
+#redis connections
+pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0)
+client = redis.StrictRedis(connection_pool = pool)
+envQueue = RedisQueue.RedisQueue(client,"EnvironmentData")
+roadQueue = RedisQueue.RedisQueue(client,"RoadCondition")
 
 
 # For certificate based connection
@@ -186,10 +195,13 @@ while True:
         envData_json=json.dumps(envData)
 
         #print envData     
-        
+        envQueue.add_to_queue(envData_json)
         myMQTTClient.publish("EnvironmentData",envData_json,0)
 
         #for motion
+        time.sleep(30)
+
+        currenttime=int(time.time())
         endlati,endlongi = loc.getLocation()
         heavyforce = 0
         vibrations = 0
@@ -214,10 +226,9 @@ while True:
         roadData_json=json.dumps(roadData)
 
         #print roadData     
-        
+        roadQueue.add_to_queue(roadData_json)
         myMQTTClient.publish("RoadCondition",roadData_json,0)
 
-        time.sleep(30)
     
 myMQTTClient.disconnect()
 motionQueue.join()
