@@ -172,13 +172,19 @@ motionQueue = Queue(maxsize=0)
 motionThread = Thread(target=sense_motion , args=(motionQueue,))
 motionThread.setDaemon(True)
 motionThread.start()
-  
+
+lati,longi = 0,0
 while True:
         lightPer = ldr.getLdrPer()
         noiseData = noise.getNoise()
         LPG,CO,SMOKE = air.getData()
         tempData,humData = weather.getData()
-        lati,longi = loc.getLocation()
+        #take last loop's ending Lati,Longi as start for now,
+        #or read new data if noisy/empty readings found
+        if (lati == 0 or longi == 0):
+            lati,longi = loc.getLocation()
+        else:
+            lati,longi = lati,longi
         currenttime=int(time.time())
         envData={}
         envData['DeviceId']=device_id
@@ -201,8 +207,8 @@ while True:
         #for motion
         time.sleep(30)
 
-        currenttime=int(time.time())
         endlati,endlongi = loc.getLocation()
+        currenttime=int(time.time())
         heavyforce = 0
         vibrations = 0
         while not motionQueue.empty():
@@ -224,6 +230,9 @@ while True:
         roadData['EndLatitude']=endlati
         roadData['EndLongitude']=endlongi
         roadData_json=json.dumps(roadData)
+
+        #make last readings as starting point of next reading
+        lati,longi = endlati,endlongi
 
         #print roadData     
         roadQueue.add_to_queue(roadData_json)

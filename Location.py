@@ -20,8 +20,14 @@ class Location:
 
     
     def getLocation(self):
-        cd=1
-        while cd <= 5:
+        """ Get Latitude,Longitude"""
+
+        #clean the buffers before reading and read fresh data everytime
+        self.port.reset_input_buffer()
+        self.port.reset_output_buffer()                        
+
+        cd=1   
+        while cd <= 3:
             ck=0
             fd=''
             while ck <= 50:
@@ -57,8 +63,7 @@ class Location:
                         #print s1
                         #print s2
 
-                        self.port.flush()
-                        return float(s1),float(s2)
+                        return float("{0:.6f}".format(round(s1,6))),float("{0:.6f}".format(round(s2,6)))
             except:
                  pass
                  #print "No Reading"
